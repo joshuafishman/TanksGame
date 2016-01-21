@@ -95,23 +95,22 @@ class Game():
         screen.blit(self.ground, (0, 435))
 
     def play(self):
-        events = [event.type for event in pygame.event.get()]
-        while pygame.QUIT not in events:
-            self.paint_background()
-            
-            keys_pressed = [event for event in pygame.event.get() if event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN]    
+        stop = False
+        while stop is False:
+            keys_pressed = [event for event in pygame.event.get() if event.type == pygame.KEYDOWN or event.type == pygame.QUIT]    
             for e in keys_pressed:
+                if e.type == pygame.QUIT:
+                    stop = True
+                    break
                 if e.key == pygame.K_RIGHT:
                     self.playerOne.moveForward()
                 if e.key == pygame.K_LEFT:
                     self.playerOne.moveBackward()
                     
+            self.paint_background()
             self.tanks.draw(self.screen)
             self.tanks.update()
-            self.bullet.updatePosition(self.screen)
-            self.bullets.draw(self.screen)
             screenUpdate()    
-            events = [event.type for event in pygame.event.get()]
         pygame.quit()
         sys.exit()
 
