@@ -1,0 +1,122 @@
+
+import pygame, time, sys, math
+
+def screenUpdate():
+    pygame.display.flip()
+
+class Tank(pygame.sprite.Sprite):
+
+    def __init__(self, location):
+        super(Tank, self).__init__()
+
+        self.image = pygame.image.load('tank1.bmp').convert()
+        self.rect = self.image.get_rect()
+
+        self.rect.x = location
+        self.rect.y = 370
+
+        #self.barrel = pygame.draw.line(self.screen, (255, 255, 255), 
+
+    def moveForward(self):
+        self.rect.x += 25      
+
+    def moveBackward(self):
+        self.rect.x -= 25
+
+    def getCurrLoc(self):
+        return (self.rect.x, self.rect.y)
+
+    def angleUp(self):
+        pass
+
+    def angleDown(self):
+        pass
+
+class Barrel():
+
+    def __init__(self, screen, tankLoc, angle = 60):
+        self.screen = screen
+        self.barrelLength = 25
+        self.angle = math.radians(angle)
+        self.tankLoc = tankLoc
+
+        self.startPos = (self.tankLoc[0] + 30, self.tankLoc[1])
+        self.endPos = (self.startPos[0] + (self.barrelLength * math.cos(self.angle)), self.startPos[1] - self.barrelLength * math.sin(self.angle))
+        print self.startPos
+        print self.endPos
+        pygame.draw.line(self.screen, (0, 0, 0), self.startPos, self.endPos, 3)
+
+    def angleUp(self):
+        pass
+
+    def angleDown(self):
+        pass
+
+    def translate(self):
+        pass
+
+
+
+class Game():
+
+    def __init__(self, screen):
+        self.screen = screen
+        self.prev_and_off = [pygame.time.get_ticks(),0.0] #tuple for background
+        self.playerOne = Tank(10)
+        self.playerTwo = Tank(400)
+        self.tanks = pygame.sprite.Group()
+        self.background = pygame.image.load ("background.bmp")
+        self.ground = pygame.image.load ("ground.bmp")
+        self.tanks.add(self.playerOne)
+        self.tanks.add(self.playerTwo)
+
+        print self.tanks.sprites()
+
+        self.tanks.draw(self.screen)
+
+        self.barrel = Barrel(self.screen, self.playerOne.getCurrLoc())
+
+        screenUpdate()
+
+
+
+    
+    def paint_background (self, prev_and_off):
+        """paint and scroll background, takes and returns the tuple [previous background shift   time, current background offset distance]"""
+        offset = prev_and_off[1]
+        prevtime = prev_and_off[0]
+        screen.blit(self.background, [-995+offset,0])
+        screen.blit(self.background, [offset,0])
+        screen.blit(self.ground, [0, 435])
+        if pygame.time.get_ticks() - prevtime > 50:
+                n_offset=offset+.5
+                n_prevtime = pygame.time.get_ticks()
+                if n_offset >= 1000:
+                        n_offset =0
+                return [n_prevtime, n_offset]
+        return [prevtime, offset]
+
+
+    def play(self):
+        events = [event.type for event in pygame.event.get()]
+        while pygame.QUIT not in events:
+            self.prev_and_off=self.paint_background(self.prev_and_off) #paint and update background
+            if pygame.MOUSEBUTTONDOWN in events:
+                self.back.update(0)
+                self.playerOne.moveForward()
+            self.tanks.draw(self.screen)
+            self.barrel = Barrel(self.screen, self.playerOne.getCurrLoc())
+            screenUpdate()    
+            events = [event.type for event in pygame.event.get()]
+        pygame.quit()
+        sys.exit()
+
+
+pygame.init()
+screen = pygame.display.set_mode( (1000, 500) )
+pygame.display.set_caption('Tanks')
+
+my_game = Game(screen)
+my_game.play()
+
+
