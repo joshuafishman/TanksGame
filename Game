@@ -2,6 +2,7 @@ import pygame, time, sys, math
 
 def screenUpdate():
     pygame.display.flip()
+
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, posX, posY,velX, velY):
         super(Bullet, self).__init__()
@@ -12,7 +13,7 @@ class Bullet(pygame.sprite.Sprite):
         self.posY = posY
         self.velX = velX
         self.velY = velY
-        self.accY = .1
+        self.accY = .001
         self.rect = self.image.get_rect()
 
 
@@ -21,12 +22,16 @@ class Bullet(pygame.sprite.Sprite):
         self.velY = self.velY + self.accY
         self.posY = self.posY + self.velY
         screen.blit(self.image,self.getCurrPos())
+
     def getCurrPos(self):
         return (self.posX,self.posY)
 
+    def update(self):
+        self.updatePosition(self.screen)
+        
     def getCurrVel(self):
         return (self.velX, self.velY)
-
+    
 class Tank(pygame.sprite.Sprite):
 
     def __init__(self, screen, location, orientation):
@@ -67,7 +72,10 @@ class Tank(pygame.sprite.Sprite):
         
     def getBarrelVals(self):
         return [self.startpos,self.angle]
-        
+   
+    def fire(self):
+        return Bullet(self.getBarrelVals[0][0], self.getBarrelVals[0][1], .1*math.cos(self.getBarrelVals[1]), math.cos(self.getBarrelVals[1]),math.sin(self.getBarrelVals[1]))
+
 class Game():
 
     def __init__(self, screen):
@@ -81,9 +89,7 @@ class Game():
         self.tanks.add(self.playerOne)
         self.tanks.add(self.playerTwo)
 
-        self.bullet = Bullet(200,200,.1,.1)
         self.bullets = pygame.sprite.Group()
-        self.bullets.add(self.bullet)
         print self.tanks.sprites()
 
         self.tanks.draw(self.screen)
