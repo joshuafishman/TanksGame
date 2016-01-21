@@ -19,7 +19,8 @@ class Bullet(pygame.sprite.Sprite):
         self.posX = self.posX + self.velX
         self.velY = self.velY + self.accY
         self.posY = self.posY + self.velY
-
+        self.rect.x = self.posX
+        self.rect.y = self.posY
     def getCurrPos(self):
         return (self.posX,self.posY)
 
@@ -100,7 +101,7 @@ class Tank(pygame.sprite.Sprite):
         return self.fuel
    
     def fire(self):
-        return Bullet(self.getBarrelVals()[0][0], self.getBarrelVals()[0][1],2*math.cos(self.getBarrelVals()[1]), -2*math.sin(self.getBarrelVals()[1]))
+        return Bullet(self.getBarrelVals()[0][0], self.getBarrelVals()[0][1]-15,2*math.cos(self.getBarrelVals()[1]), -2*math.sin(self.getBarrelVals()[1]))
 
     def hit(self):
         self.health -= 10
@@ -190,6 +191,16 @@ class Game():
             self.paint_background()
             self.tanks.draw(self.screen)
             self.tanks.update()
+            for b in self.bullets.sprites(): #bullets.draw didn't work
+                if pygame.sprite.collide_rect(b,self.playerOne):
+                    b.kill()
+                    self.playerOne.health -= 10
+                if pygame.sprite.collide_rect(b,self.playerTwo):
+                    b.kill()
+                    self.playerTwo.health -= 10
+                if b.posY>460:
+                    b.kill()
+                self.screen.blit(b.image,b.getCurrPos())
             self.scoreboard.health(self.playerOne.getHealth(), self.playerTwo.getHealth())
             if self.playerOne.turn is True:
                 self.scoreboard.angle(180 - int(math.degrees(self.playerOne.getAngle())))
@@ -199,8 +210,6 @@ class Game():
                 self.scoreboard.angle(180 - int(math.degrees(self.playerTwo.getAngle())))
                 #self.scoreboard.power(self.playerTwo.
                 self.scoreboard.fuel(self.playerTwo.getFuel())
-            for b in self.bullets.sprites(): #bullets.draw didn't work
-                self.screen.blit(b.image,b.getCurrPos())
             self.bullets.update()
             screenUpdate()    
         pygame.quit()
