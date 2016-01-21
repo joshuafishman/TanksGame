@@ -17,17 +17,16 @@ class Bullet(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
 
 
-    def updatePosition(self, screen):
+    def updatePosition(self):
         self.posX = self.posX + self.velX
         self.velY = self.velY + self.accY
         self.posY = self.posY + self.velY
-        screen.blit(self.image,self.getCurrPos())
 
     def getCurrPos(self):
         return (self.posX,self.posY)
 
     def update(self):
-        self.updatePosition(self.screen)
+        self.updatePosition()
         
     def getCurrVel(self):
         return (self.velX, self.velY)
@@ -85,11 +84,11 @@ class Tank(pygame.sprite.Sprite):
         pygame.draw.line(self.screen, (0, 0, 0), self.startPos, self.endPos, 3)
         
     def getBarrelVals(self):
-        return [self.startpos,self.angle]
+        return [self.startPos,self.angle]
    
     def fire(self):
-        return Bullet(self.getBarrelVals[0][0], self.getBarrelVals[0][1], .1*math.cos(self.getBarrelVals[1]), math.cos(self.getBarrelVals[1]),math.sin(self.getBarrelVals[1]))
-
+        print(self.getBarrelVals()[0][0], self.getBarrelVals()[0][1],math.cos(self.getBarrelVals()[1]),math.sin(self.getBarrelVals()[1]))
+        return Bullet(self.getBarrelVals()[0][0], self.getBarrelVals()[0][1],math.cos(self.getBarrelVals()[1]),math.sin(self.getBarrelVals()[1]))
 class Game():
 
     def __init__(self, screen):
@@ -130,10 +129,18 @@ class Game():
                     self.playerOne.moveForward()
                 if e.key == pygame.K_LEFT:
                     self.playerOne.moveBackward()
-                    
+                if e.key == pygame.K_SPACE:
+                    if self.playerOne.turn is True:
+                        self.bullets.add(self.playerOne.fire())
+                    elif self.playerTwo.turn is True:
+                        self.bullets.add(self.playerTwo.fire())
+                    self.playerOne.changeTurn()
+                    self.playerTwo.changeTurn()                    
             self.paint_background()
             self.tanks.draw(self.screen)
             self.tanks.update()
+            self.bullets.draw(self.screen)
+            self.bullets.update()
             screenUpdate()    
         pygame.quit()
         sys.exit()
