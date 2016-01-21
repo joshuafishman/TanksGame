@@ -13,7 +13,7 @@ class Bullet(pygame.sprite.Sprite):
         self.posY = posY
         self.velX = velX
         self.velY = velY
-        self.accY = .001
+        self.accY = .01
         self.rect = self.image.get_rect()
 
 
@@ -91,7 +91,7 @@ class Tank(pygame.sprite.Sprite):
    
     def fire(self):
         print(self.getBarrelVals()[0][0], self.getBarrelVals()[0][1],math.cos(self.getBarrelVals()[1]),math.sin(self.getBarrelVals()[1]))
-        return Bullet(self.getBarrelVals()[0][0], self.getBarrelVals()[0][1],math.cos(self.getBarrelVals()[1]),math.sin(self.getBarrelVals()[1]))
+        return Bullet(self.getBarrelVals()[0][0], self.getBarrelVals()[0][1],2*math.cos(self.getBarrelVals()[1]), -2*math.sin(self.getBarrelVals()[1]))
 
 class Scoreboard():
     def __init__(self, screen):
