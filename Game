@@ -44,6 +44,7 @@ class Tank(pygame.sprite.Sprite):
             print "Invalid Orientation"
         
         self.health = 100
+        self.power = 50
         self.fuel = 100
         
         self.barrelLength = 15
@@ -102,9 +103,17 @@ class Tank(pygame.sprite.Sprite):
    
     def fire(self):
         return Bullet(self.getBarrelVals()[0][0], self.getBarrelVals()[0][1]-15,2*math.cos(self.getBarrelVals()[1]), -2*math.sin(self.getBarrelVals()[1]))
+        
+    def powerUp(self):
+        if self.power < 100:
+            self.power += 5
 
-    def hit(self):
-        self.health -= 10
+    def powerDown(self):
+        if self.power > 0:
+            self.power -= 5
+
+    def getPower(self):
+        return self.power
 
 class Scoreboard():
     def __init__(self, screen):
@@ -181,6 +190,16 @@ class Game():
                         self.playerOne.moveBackward() 
                     elif self.playerTwo.turn is True:
                         self.playerTwo.moveBackward() 
+                if e.key == pygame.K_UP:
+                    if self.playerOne.turn is True:
+                        self.playerOne.powerUp() 
+                    elif self.playerTwo.turn is True:
+                        self.playerTwo.powerUp() 
+                if e.key == pygame.K_DOWN:
+                    if self.playerOne.turn is True:
+                        self.playerOne.powerDown() 
+                    elif self.playerTwo.turn is True:
+                        self.playerTwo.powerDown()
                 if e.key == pygame.K_SPACE:
                     if self.playerOne.turn is True:
                         self.bullets.add(self.playerOne.fire())
@@ -204,11 +223,11 @@ class Game():
             self.scoreboard.health(self.playerOne.getHealth(), self.playerTwo.getHealth())
             if self.playerOne.turn is True:
                 self.scoreboard.angle(180 - int(math.degrees(self.playerOne.getAngle())))
-                #self.scoreboard.power(self.playerOne.
+                self.scoreboard.power(self.playerOne.getPower())
                 self.scoreboard.fuel(self.playerOne.getFuel())       
             elif self.playerTwo.turn is True:
                 self.scoreboard.angle(180 - int(math.degrees(self.playerTwo.getAngle())))
-                #self.scoreboard.power(self.playerTwo.
+                self.scoreboard.power(self.playerTwo.getPower())
                 self.scoreboard.fuel(self.playerTwo.getFuel())
             self.bullets.update()
             screenUpdate()    
