@@ -10,8 +10,10 @@ class Tank(pygame.sprite.Sprite):
         super(Tank, self).__init__()
         if orientation == 'left':
             self.image = pygame.image.load('tank1.bmp').convert()
-        if orientation == 'right':
+        elif orientation == 'right':
             self.image = pygame.image.load('tank2.bmp').convert()
+        else:
+            print "Invalid Orientation
         self.image.set_colorkey((255,255,255), pygame.RLEACCEL)
         self.rect = self.image.get_rect()
 
