@@ -67,9 +67,10 @@ class Tank(pygame.sprite.Sprite):
             self.turn = True
         return self.turn
     
-     def moveForward(self):
+    def moveForward(self):
         self.rect.x += 10      
         self.fuel-=10
+    
     def moveBackward(self):
         self.rect.x -= 10
         self.fuel-=10
@@ -91,11 +92,45 @@ class Tank(pygame.sprite.Sprite):
     def fire(self):
         print(self.getBarrelVals()[0][0], self.getBarrelVals()[0][1],math.cos(self.getBarrelVals()[1]),math.sin(self.getBarrelVals()[1]))
         return Bullet(self.getBarrelVals()[0][0], self.getBarrelVals()[0][1],math.cos(self.getBarrelVals()[1]),math.sin(self.getBarrelVals()[1]))
+
+class Scoreboard():
+    def __init__(self, screen):
+        self.screen = screen
+        
+        self.font = pygame.font.Font(None, 30)
+        self.font.set_bold(True)
+
+    def renderText(self, text, color):
+        return self.font.render(text, False, color)
+
+    def score(self, playerOneScore, playerTwoScore):
+        self.screen.blit(self.renderText("Score:", (255, 255, 255)), (50, 50))
+        self.screen.blit(self.renderText("Score:", (255, 255, 255)), (800, 50))
+        self.screen.blit(self.renderText(str(playerOneScore), (255, 0, 0)), (140, 50))
+        self.screen.blit(self.renderText(str(playerTwoScore), (255, 0, 0)), (890, 50))
+
+    def angle(self, angle):
+        self.screen.blit(self.renderText("Angle:", (255, 255, 255)), (300, 455))
+        self.screen.blit(self.renderText(str(angle), (255, 255, 255)), (390, 455))
+
+    def power(self, power):
+        self.screen.blit(self.renderText("Power", (255, 255, 255)), (515, 455))
+        pygame.draw.rect(self.screen, (255, 255, 255), [600, 450, 100, 30], 0)
+        pygame.draw.rect(self.screen, (255, 0, 0), [600, 450, power, 30], 0)
+        pygame.draw.rect(self.screen, (0, 0, 0), [600, 450, 100, 30], 2)
+        self.screen.blit(self.renderText(str(power), (0, 0, 0)), (640, 457))
+
+    def fuel(self, power):
+        self.screen.blit(self.renderText("Fuel", (255, 255, 255)), (515, 455))
+        pygame.draw.rect(self.screen, (255, 255, 255), [600, 450, 100, 30], 0)
+        pygame.draw.rect(self.screen, (255, 0, 0), [600, 450, power, 30], 0)
+        pygame.draw.rect(self.screen, (0, 0, 0), [600, 450, 100, 30], 2)
+        self.screen.blit(self.renderText(str(power), (0, 0, 0)), (640, 457))
+
 class Game():
 
     def __init__(self, screen):
         self.screen = screen
-        self.prev_and_off = [pygame.time.get_ticks(),0.0] #tuple for background
         self.playerOne = Tank(self.screen, 10,'left')
         self.playerTwo = Tank(self.screen, 400,'right')
         self.tanks = pygame.sprite.Group()
@@ -103,14 +138,13 @@ class Game():
         self.ground = pygame.image.load ("ground.bmp")
         self.tanks.add(self.playerOne)
         self.tanks.add(self.playerTwo)
+        
+        self.scoreboard = Scoreboard(self.screen)
 
         self.bullets = pygame.sprite.Group()
-        print self.tanks.sprites()
-
-        self.tanks.draw(self.screen)
-
-        screenUpdate()
-    
+        
+        self.playerOneScore = 10
+        self.playerTwoScore = 25
 
     def paint_background(self):
         offset = (pygame.time.get_ticks() % 100000) / 100
@@ -147,6 +181,15 @@ class Game():
             self.paint_background()
             self.tanks.draw(self.screen)
             self.tanks.update()
+            self.scoreboard.score(self.playerOneScore, self.playerTwoScore)
+            if self.playerOne.turn is True:
+                self.scoreboard.angle(180 - int(math.degrees(self.playerOne.angle)))
+                #self.scoreboard.power(self.playerOne
+                #self.scoreboard.fuel(self.playerOne        
+            elif self.playerTwo.turn is True:
+                self.scoreboard.angle(180 - int(math.degrees(self.playerTwo.angle)))
+                #self.scoreboard.power(self.playerTwo
+                #self.scoreboard.fuel(self.playerTwo
             for b in self.bullets.sprites(): #bullets.draw didn't work
                 self.screen.blit(b.image,b.getCurrPos())
             self.bullets.update()
@@ -158,6 +201,7 @@ class Game():
 pygame.init()
 screen = pygame.display.set_mode( (1000, 500) )
 pygame.display.set_caption('Tanks')
+pygame.mouse.set_cursor(*pygame.cursors.broken_x)
 
 my_game = Game(screen)
 my_game.play()
