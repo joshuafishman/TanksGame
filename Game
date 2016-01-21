@@ -29,6 +29,11 @@ class Bullet(pygame.sprite.Sprite):
         
     def getCurrVel(self):
         return (self.velX, self.velY)
+        
+    def kill(self, screen):
+        pygame.draw.circle(screen, (255,255,0), (int(self.posX), int(self.posY)), 15, 0)
+        pygame.time.wait(3)
+        super(Bullet, self).kill()    
     
 class Tank(pygame.sprite.Sprite):
 
@@ -233,13 +238,13 @@ class Game():
             self.tanks.update()
             for b in self.bullets.sprites(): #bullets.draw didn't work
                 if pygame.sprite.collide_rect(b,self.playerOne):
-                    b.kill()
+                    b.kill(self.screen)
                     self.playerOne.health -= 10
                 if pygame.sprite.collide_rect(b,self.playerTwo):
-                    b.kill()
+                    b.kill(self.screen)
                     self.playerTwo.health -= 10
                 if b.posY>460:
-                    b.kill()
+                    b.kill(self.screen)
                 self.screen.blit(b.image,b.getCurrPos())
             self.scoreboard.health(self.playerOne.getHealth(), self.playerTwo.getHealth())
             if self.playerOne.turn is True:
