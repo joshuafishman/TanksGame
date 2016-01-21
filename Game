@@ -126,9 +126,15 @@ class Game():
                     stop = True
                     break
                 if e.key == pygame.K_RIGHT:
-                    self.playerOne.moveForward()
+                    if self.playerOne.turn is True:
+                        self.playerOne.moveForward() 
+                    elif self.playerTwo.turn is True:
+                        self.playerTwo.moveForward() 
                 if e.key == pygame.K_LEFT:
-                    self.playerOne.moveBackward()
+                    if self.playerOne.turn is True:
+                        self.playerOne.moveBackward() 
+                    elif self.playerTwo.turn is True:
+                        self.playerTwo.moveBackward() 
                 if e.key == pygame.K_SPACE:
                     if self.playerOne.turn is True:
                         self.bullets.add(self.playerOne.fire())
