@@ -118,12 +118,12 @@ class Scoreboard():
         pygame.draw.rect(self.screen, (0, 0, 0), [600, 450, 100, 30], 2)
         self.screen.blit(self.renderText(str(power), (0, 0, 0)), (640, 457))
 
-    def fuel(self, power):
+    def fuel(self, fuel):
         self.screen.blit(self.renderText("Fuel", (255, 255, 255)), (515, 455))
         pygame.draw.rect(self.screen, (255, 255, 255), [600, 450, 100, 30], 0)
-        pygame.draw.rect(self.screen, (255, 0, 0), [600, 450, power, 30], 0)
+        pygame.draw.rect(self.screen, (255, 0, 0), [600, 450, fuel, 30], 0)
         pygame.draw.rect(self.screen, (0, 0, 0), [600, 450, 100, 30], 2)
-        self.screen.blit(self.renderText(str(power), (0, 0, 0)), (640, 457))
+        self.screen.blit(self.renderText(str(fuel), (0, 0, 0)), (640, 457))
 
 class Game():
 
@@ -132,10 +132,11 @@ class Game():
         self.playerOne = Tank(self.screen, 10,'left')
         self.playerTwo = Tank(self.screen, 400,'right')
         self.tanks = pygame.sprite.Group()
-        self.background = pygame.image.load ("background.bmp")
-        self.ground = pygame.image.load ("ground.bmp")
         self.tanks.add(self.playerOne)
         self.tanks.add(self.playerTwo)
+        self.background = pygame.image.load ("background.bmp")
+        self.ground = pygame.image.load ("ground.bmp")
+        
         
         self.scoreboard = Scoreboard(self.screen)
 
