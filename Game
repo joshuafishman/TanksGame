@@ -54,6 +54,19 @@ class Tank(pygame.sprite.Sprite):
         self.rect.x = location
         self.rect.y = 400
 
+        self.turn=True
+        self.mousePos = pygame.mouse.get_pos()
+        self.angle = math.atan2(self.rect.y - self.mousePos[1], self.mousePos[0] - (self.rect.x + self.barrelOffset))
+        self.startPos = (self.rect.x + self.barrelOffset, self.rect.y + 5)
+        self.endPos = (self.startPos[0] + (self.barrelLength * math.cos(self.angle)), self.startPos[1] - self.barrelLength * math.sin(self.angle))
+    
+     def changeTurn (self):
+        if self.turn is True:
+            self.turn = False
+        elif self.turn is False:
+            self.turn = True
+        return self.turn
+    
     def moveForward(self):
         self.rect.x += 10      
 
@@ -65,9 +78,10 @@ class Tank(pygame.sprite.Sprite):
 
     def updateBarrel(self):
         self.mousePos = pygame.mouse.get_pos()
-        self.angle = math.atan2(self.rect.y - self.mousePos[1], self.mousePos[0] - (self.rect.x + self.barrelOffset))
-        self.startPos = (self.rect.x + self.barrelOffset, self.rect.y + 5)
-        self.endPos = (self.startPos[0] + (self.barrelLength * math.cos(self.angle)), self.startPos[1] - self.barrelLength * math.sin(self.angle))
+        if self.turn is True:
+            self.angle = math.atan2(self.rect.y - self.mousePos[1], self.mousePos[0] - (self.rect.x + self.barrelOffset))
+            self.startPos = (self.rect.x + self.barrelOffset, self.rect.y + 5)
+            self.endPos = (self.startPos[0] + (self.barrelLength * math.cos(self.angle)), self.startPos[1] - self.barrelLength * math.sin(self.angle))
         pygame.draw.line(self.screen, (0, 0, 0), self.startPos, self.endPos, 3)
         
     def getBarrelVals(self):
@@ -104,6 +118,7 @@ class Game():
         screen.blit(self.ground, (0, 435))
 
     def play(self):
+        print self.playerOne.changeTurn()
         stop = False
         while stop is False:
             keys_pressed = [event for event in pygame.event.get() if event.type == pygame.KEYDOWN or event.type == pygame.QUIT]    
