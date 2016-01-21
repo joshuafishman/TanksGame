@@ -61,25 +61,16 @@ class Game():
         screenUpdate()
     
 
-    def paint_background (self, prev_and_off):
-        """paint and scroll background, takes and returns the tuple [previous background shift   time, current background offset distance]"""
-        offset = prev_and_off[1]
-        prevtime = prev_and_off[0]
-        screen.blit(self.background, [-995+offset,0])
-        screen.blit(self.background, [offset,0])
-        screen.blit(self.ground, [0, 435])
-        if pygame.time.get_ticks() - prevtime > 50:
-                n_offset=offset+.5
-                n_prevtime = pygame.time.get_ticks()
-                if n_offset >= 1000:
-                        n_offset =0
-                return [n_prevtime, n_offset]
-        return [prevtime, offset]
+    def paint_background(self):
+        offset = (pygame.time.get_ticks() % 100000) / 100
+        screen.blit(self.background, (offset, 0))
+        screen.blit(self.background, (offset - 1000, 0))
+        screen.blit(self.ground, (0, 435))
 
     def play(self):
         events = [event.type for event in pygame.event.get()]
         while pygame.QUIT not in events:
-            self.prev_and_off=self.paint_background(self.prev_and_off) #paint and update background
+            self.paint_background()
             
             keys_pressed = [event for event in pygame.event.get() if event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN]    
             for e in keys_pressed:
