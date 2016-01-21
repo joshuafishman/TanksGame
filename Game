@@ -2,6 +2,30 @@ import pygame, time, sys, math
 
 def screenUpdate():
     pygame.display.flip()
+class Bullet(pygame.sprite.Sprite):
+    def __init__(self, posX, posY,velX, velY):
+        super(Bullet, self).__init__()
+        self.image = pygame.image.load('bullet.bmp').convert()
+        self.image.set_colorkey((255,255,255), pygame.RLEACCEL)
+        
+        self.posX = posX
+        self.posY = posY
+        self.velX = velX
+        self.velY = velY
+        self.accY = .1
+        self.rect = self.image.get_rect()
+
+
+    def updatePosition(self, screen):
+        self.posX = self.posX + self.velX
+        self.velY = self.velY + self.accY
+        self.posY = self.posY + self.velY
+        screen.blit(self.image,self.getCurrPos())
+    def getCurrPos(self):
+        return (self.posX,self.posY)
+
+    def getCurrVel(self):
+        return (self.velX, self.velY)
 
 class Tank(pygame.sprite.Sprite):
 
@@ -54,6 +78,9 @@ class Game():
         self.tanks.add(self.playerOne)
         self.tanks.add(self.playerTwo)
 
+        self.bullet = Bullet(200,200,.1,.1)
+        self.bullets = pygame.sprite.Group()
+        self.bullets.add(self.bullet)
         print self.tanks.sprites()
 
         self.tanks.draw(self.screen)
@@ -81,6 +108,8 @@ class Game():
                     
             self.tanks.draw(self.screen)
             self.tanks.update()
+            self.bullet.updatePosition(self.screen)
+            self.bullets.draw(self.screen)
             screenUpdate()    
             events = [event.type for event in pygame.event.get()]
         pygame.quit()
