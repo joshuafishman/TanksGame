@@ -8,13 +8,13 @@ class Bullet(pygame.sprite.Sprite):
         super(Bullet, self).__init__()
         self.image = pygame.image.load('bullet.bmp').convert()
         self.image.set_colorkey((255,255,255), pygame.RLEACCEL)
-        
+        self.rect = self.image.get_rect()
         self.posX = posX
         self.posY = posY
         self.velX = velX
         self.velY = velY
         self.accY = .01
-        self.rect = self.image.get_rect()
+        
 
 
     def updatePosition(self):
@@ -65,7 +65,6 @@ class Tank(pygame.sprite.Sprite):
             self.turn = False
         elif self.turn is False:
             self.turn = True
-        return self.turn
     
     def moveForward(self):
         self.rect.x += 10      
@@ -90,7 +89,6 @@ class Tank(pygame.sprite.Sprite):
         return [self.endPos,self.angle]
    
     def fire(self):
-        print(self.getBarrelVals()[0][0], self.getBarrelVals()[0][1],math.cos(self.getBarrelVals()[1]),math.sin(self.getBarrelVals()[1]))
         return Bullet(self.getBarrelVals()[0][0], self.getBarrelVals()[0][1],2*math.cos(self.getBarrelVals()[1]), -2*math.sin(self.getBarrelVals()[1]))
 
 class Scoreboard():
@@ -148,12 +146,12 @@ class Game():
 
     def paint_background(self):
         offset = (pygame.time.get_ticks() % 100000) / 100
-        screen.blit(self.background, (offset, 0))
-        screen.blit(self.background, (offset - 1000, 0))
-        screen.blit(self.ground, (0, 435))
+        self.screen.blit(self.background, (offset, 0))
+        self.screen.blit(self.background, (offset - 1000, 0))
+        self.screen.blit(self.ground, (0, 435))
 
     def play(self):
-        print self.playerOne.changeTurn()
+        self.playerOne.changeTurn()
         stop = False
         while stop is False:
             keys_pressed = [event for event in pygame.event.get() if event.type == pygame.KEYDOWN or event.type == pygame.QUIT]    
