@@ -153,7 +153,7 @@ class Scoreboard():
         self.numVal('Angle:', angle, (150, 455))
 
     def power(self, power):
-        self.powerBar('Power', power, (515, 455))
+        self.powerBar('Power', power, (400, 455))
 
     def fuel(self, fuel):
         self.powerBar('Fuel', fuel, (700, 455))
