@@ -8,8 +8,10 @@ class Tank(pygame.sprite.Sprite):
 
     def __init__(self, location):
         super(Tank, self).__init__()
-
-        self.image = pygame.image.load('tank1.bmp').convert()
+        if orientation == 'left':
+            self.image = pygame.image.load('tank1.bmp').convert()
+        if orientation == 'right':
+            self.image = pygame.image.load('tank2.bmp').convert()
         self.image.set_colorkey((255,255,255), pygame.RLEACCEL)
         self.rect = self.image.get_rect()
 
@@ -63,8 +65,8 @@ class Game():
     def __init__(self, screen):
         self.screen = screen
         self.prev_and_off = [pygame.time.get_ticks(),0.0] #tuple for background
-        self.playerOne = Tank(10)
-        self.playerTwo = Tank(400)
+        self.playerOne = Tank(10,'left')
+        self.playerTwo = Tank(400,'right')
         self.tanks = pygame.sprite.Group()
         self.background = pygame.image.load ("background.bmp")
         self.ground = pygame.image.load ("ground.bmp")
@@ -103,7 +105,6 @@ class Game():
         while pygame.QUIT not in events:
             self.prev_and_off=self.paint_background(self.prev_and_off) #paint and update background
             if pygame.MOUSEBUTTONDOWN in events:
-                self.back.update(0)
                 self.playerOne.moveForward()
             self.tanks.draw(self.screen)
             self.barrel = Barrel(self.screen, self.playerOne.getCurrLoc())
