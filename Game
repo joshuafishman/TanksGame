@@ -86,7 +86,7 @@ class Tank(pygame.sprite.Sprite):
         pygame.draw.line(self.screen, (0, 0, 0), self.startPos, self.endPos, 3)
         
     def getBarrelVals(self):
-        return [self.startPos,self.angle]
+        return [self.endPos,self.angle]
    
     def fire(self):
         print(self.getBarrelVals()[0][0], self.getBarrelVals()[0][1],math.cos(self.getBarrelVals()[1]),math.sin(self.getBarrelVals()[1]))
@@ -147,7 +147,8 @@ class Game():
             self.paint_background()
             self.tanks.draw(self.screen)
             self.tanks.update()
-            self.bullets.draw(self.screen)
+            for b in self.bullets.sprites(): #bullets.draw didn't work
+                self.screen.blit(b.image,b.getCurrPos())
             self.bullets.update()
             screenUpdate()    
         pygame.quit()
