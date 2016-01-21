@@ -164,19 +164,19 @@ class Game():
         self.screen = screen
         self.size = size
         self.playerOne = Tank(self.screen, 10,'left')
-        self.playerTwo = Tank(self.screen, self.size - 80 ,'right')
+        self.playerTwo = Tank(self.screen, self.size[0] - 80 ,'right')
         self.tanks = pygame.sprite.Group()
         self.tanks.add(self.playerOne)
         self.tanks.add(self.playerTwo)
-        self.blocks=pygame.sprite.Group()
+        self.blocks = pygame.sprite.Group()
         
-        b=[[False for x in range((size-200)/15)] for x in range(31)] #make a field of blocks
+        b=[[False for x in range((size[0]-200)/15)] for x in range(31)] #make a field of blocks
         for i in range (31):
-            for j in range ((size-200)/15):
+            for j in range ((size[0]-200)/15):
                 if random.random()<.4:
                     if i is 0 or b[i-1][j] is True:
                         self.blocks.add(Block((j*15+100,420-(i*15))))
-                        b[i][j]=True   
+                        b[i][j]=True     
                     
         self.background = pygame.image.load ("background.bmp")
         self.ground = pygame.image.load ("ground.bmp")
@@ -257,8 +257,8 @@ class Game():
 
 
 pygame.init()
-size = 500+random.randint(0,500)
-screen = pygame.display.set_mode( (size, 500) )
+size = (1000, 500)
+screen = pygame.display.set_mode(size)
 pygame.display.set_caption('Tanks')
 pygame.mouse.set_cursor(*pygame.cursors.broken_x)
 
