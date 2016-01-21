@@ -60,7 +60,7 @@ class Tank(pygame.sprite.Sprite):
         self.startPos = (self.rect.x + self.barrelOffset, self.rect.y + 5)
         self.endPos = (self.startPos[0] + (self.barrelLength * math.cos(self.angle)), self.startPos[1] - self.barrelLength * math.sin(self.angle))
     
-     def changeTurn (self):
+    def changeTurn (self):
         if self.turn is True:
             self.turn = False
         elif self.turn is False:
