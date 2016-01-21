@@ -1,4 +1,3 @@
-
 import pygame, time, sys, math
 
 def screenUpdate():
@@ -6,69 +5,49 @@ def screenUpdate():
 
 class Tank(pygame.sprite.Sprite):
 
-    def __init__(self, location, orientation):
+    def __init__(self, screen, location, orientation):
         super(Tank, self).__init__()
         if orientation == 'left':
             self.image = pygame.image.load('tank1.bmp').convert()
+            self.barrelOffset = 64
         elif orientation == 'right':
             self.image = pygame.image.load('tank2.bmp').convert()
+            self.barrelOffset = 34
         else:
-            print "Invalid Orientation
+            print "Invalid Orientation"
+
+        self.barrelLength = 25
+        self.screen = screen
+        
         self.image.set_colorkey((255,255,255), pygame.RLEACCEL)
         self.rect = self.image.get_rect()
 
         self.rect.x = location
         self.rect.y = 370
 
-        #self.barrel = pygame.draw.line(self.screen, (255, 255, 255), 
-
     def moveForward(self):
         self.rect.x += 25      
 
     def moveBackward(self):
         self.rect.x -= 25
+        
+    def update(self):
+        self.updateBarrel()
 
-    def getCurrLoc(self):
-        return (self.rect.x, self.rect.y)
-
-    def angleUp(self):
-        pass
-
-    def angleDown(self):
-        pass
-
-class Barrel():
-
-    def __init__(self, screen, tankLoc, angle = 60):
-        self.screen = screen
-        self.barrelLength = 25
-        self.angle = math.radians(angle)
-        self.tankLoc = tankLoc
-
-        self.startPos = (self.tankLoc[0] + 30, self.tankLoc[1])
+    def updateBarrel(self):
+        self.mousePos = pygame.mouse.get_pos()
+        self.angle = math.atan2(self.rect.y - self.mousePos[1], self.mousePos[0] - (self.rect.x + self.barrelOffset))
+        self.startPos = (self.rect.x + self.barrelOffset, self.rect.y + 8)
         self.endPos = (self.startPos[0] + (self.barrelLength * math.cos(self.angle)), self.startPos[1] - self.barrelLength * math.sin(self.angle))
-        print self.startPos
-        print self.endPos
         pygame.draw.line(self.screen, (0, 0, 0), self.startPos, self.endPos, 3)
-
-    def angleUp(self):
-        pass
-
-    def angleDown(self):
-        pass
-
-    def translate(self):
-        pass
-
-
 
 class Game():
 
     def __init__(self, screen):
         self.screen = screen
         self.prev_and_off = [pygame.time.get_ticks(),0.0] #tuple for background
-        self.playerOne = Tank(10,'left')
-        self.playerTwo = Tank(400,'right')
+        self.playerOne = Tank(self.screen, 10,'left')
+        self.playerTwo = Tank(self.screen, 400,'right')
         self.tanks = pygame.sprite.Group()
         self.background = pygame.image.load ("background.bmp")
         self.ground = pygame.image.load ("ground.bmp")
@@ -79,13 +58,9 @@ class Game():
 
         self.tanks.draw(self.screen)
 
-        self.barrel = Barrel(self.screen, self.playerOne.getCurrLoc())
-
         screenUpdate()
-
-
-
     
+
     def paint_background (self, prev_and_off):
         """paint and scroll background, takes and returns the tuple [previous background shift   time, current background offset distance]"""
         offset = prev_and_off[1]
@@ -101,7 +76,6 @@ class Game():
                 return [n_prevtime, n_offset]
         return [prevtime, offset]
 
-
     def play(self):
         events = [event.type for event in pygame.event.get()]
         while pygame.QUIT not in events:
@@ -109,7 +83,7 @@ class Game():
             if pygame.MOUSEBUTTONDOWN in events:
                 self.playerOne.moveForward()
             self.tanks.draw(self.screen)
-            self.barrel = Barrel(self.screen, self.playerOne.getCurrLoc())
+            self.tanks.update()
             screenUpdate()    
             events = [event.type for event in pygame.event.get()]
         pygame.quit()
@@ -122,5 +96,3 @@ pygame.display.set_caption('Tanks')
 
 my_game = Game(screen)
 my_game.play()
-
-
