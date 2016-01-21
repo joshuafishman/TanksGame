@@ -64,7 +64,10 @@ class Tank(pygame.sprite.Sprite):
         self.startPos = (self.rect.x + self.barrelOffset, self.rect.y + 5)
         self.endPos = (self.startPos[0] + (self.barrelLength * math.cos(self.angle)), self.startPos[1] - self.barrelLength * math.sin(self.angle))
         pygame.draw.line(self.screen, (0, 0, 0), self.startPos, self.endPos, 3)
-
+        
+    def getBarrelVals(self):
+        return [self.startpos,self.angle]
+        
 class Game():
 
     def __init__(self, screen):
