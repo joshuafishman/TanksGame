@@ -15,8 +15,6 @@ class Bullet(pygame.sprite.Sprite):
         self.velY = velY
         self.accY = .01
         
-
-
     def updatePosition(self):
         self.posX = self.posX + self.velX
         self.velY = self.velY + self.accY
@@ -44,7 +42,9 @@ class Tank(pygame.sprite.Sprite):
         else:
             print "Invalid Orientation"
         
-        self.fuel=70
+        self.health = 100
+        self.fuel = 100
+        
         self.barrelLength = 15
         self.screen = screen
         
@@ -54,7 +54,7 @@ class Tank(pygame.sprite.Sprite):
         self.rect.x = location
         self.rect.y = 400
 
-        self.turn=True
+        self.turn = True
         self.mousePos = pygame.mouse.get_pos()
         self.angle = math.atan2(self.rect.y - self.mousePos[1], self.mousePos[0] - (self.rect.x + self.barrelOffset))
         self.startPos = (self.rect.x + self.barrelOffset, self.rect.y + 5)
@@ -67,12 +67,14 @@ class Tank(pygame.sprite.Sprite):
             self.turn = True
     
     def moveForward(self):
-        self.rect.x += 10      
-        self.fuel-=10
+        if self.fuel != 0:
+            self.rect.x += 10      
+            self.fuel-=10
     
     def moveBackward(self):
-        self.rect.x -= 10
-        self.fuel-=10
+        if self.fuel != 0:
+            self.rect.x -= 10
+            self.fuel-=10
         
     def update(self):
         self.updateBarrel()
@@ -87,9 +89,21 @@ class Tank(pygame.sprite.Sprite):
         
     def getBarrelVals(self):
         return [self.endPos,self.angle]
+        
+    def getAngle(self):
+        return self.angle
+
+    def getHealth(self):
+        return self.health
+
+    def getFuel(self):
+        return self.fuel
    
     def fire(self):
         return Bullet(self.getBarrelVals()[0][0], self.getBarrelVals()[0][1],2*math.cos(self.getBarrelVals()[1]), -2*math.sin(self.getBarrelVals()[1]))
+
+    def hit(self):
+        self.health -= 10
 
 class Scoreboard():
     def __init__(self, screen):
@@ -101,29 +115,29 @@ class Scoreboard():
     def renderText(self, text, color):
         return self.font.render(text, False, color)
 
-    def score(self, playerOneScore, playerTwoScore):
-        self.screen.blit(self.renderText("Score:", (255, 255, 255)), (50, 50))
-        self.screen.blit(self.renderText("Score:", (255, 255, 255)), (800, 50))
-        self.screen.blit(self.renderText(str(playerOneScore), (255, 0, 0)), (140, 50))
-        self.screen.blit(self.renderText(str(playerTwoScore), (255, 0, 0)), (890, 50))
+    def powerBar(self, title, power, pos):
+        self.screen.blit(self.renderText(title, (255, 255, 255)), pos)
+        pygame.draw.rect(self.screen, (255, 255, 255), [pos[0] + self.font.size(title)[0] + 10, pos[1] - 7, 100, 30], 0)
+        pygame.draw.rect(self.screen, (255, 0, 0), [pos[0] + self.font.size(title)[0] + 10, pos[1] - 7, power, 30], 0)
+        pygame.draw.rect(self.screen, (0, 0, 0), [pos[0] + self.font.size(title)[0] + 10, pos[1] - 7, 100, 30], 2)
+        self.screen.blit(self.renderText(str(power), (0, 0, 0)), (pos[0] + self.font.size(title)[0] + 10 + 50 - (self.font.size(str(power))[0] / 2), pos[1]))
+
+    def numVal(self, title, val, pos):
+        self.screen.blit(self.renderText(title, (255, 255, 255)), pos)
+        self.screen.blit(self.renderText(str(val), (255, 255, 255)), (pos[0] + self.font.size(title)[0] + 10, pos[1]))
+
+    def health(self, playerOneHealth, playerTwoHealth):
+        self.powerBar('Health', playerOneHealth, (50, 50))
+        self.powerBar('Health', playerTwoHealth, (750, 50))
 
     def angle(self, angle):
-        self.screen.blit(self.renderText("Angle:", (255, 255, 255)), (300, 455))
-        self.screen.blit(self.renderText(str(angle), (255, 255, 255)), (390, 455))
+        self.numVal('Angle:', angle, (150, 455))
 
     def power(self, power):
-        self.screen.blit(self.renderText("Power", (255, 255, 255)), (515, 455))
-        pygame.draw.rect(self.screen, (255, 255, 255), [600, 450, 100, 30], 0)
-        pygame.draw.rect(self.screen, (255, 0, 0), [600, 450, power, 30], 0)
-        pygame.draw.rect(self.screen, (0, 0, 0), [600, 450, 100, 30], 2)
-        self.screen.blit(self.renderText(str(power), (0, 0, 0)), (640, 457))
+        self.powerBar('Power', power, (515, 455))
 
     def fuel(self, fuel):
-        self.screen.blit(self.renderText("Fuel", (255, 255, 255)), (515, 455))
-        pygame.draw.rect(self.screen, (255, 255, 255), [600, 450, 100, 30], 0)
-        pygame.draw.rect(self.screen, (255, 0, 0), [600, 450, fuel, 30], 0)
-        pygame.draw.rect(self.screen, (0, 0, 0), [600, 450, 100, 30], 2)
-        self.screen.blit(self.renderText(str(fuel), (0, 0, 0)), (640, 457))
+        self.powerBar('Fuel', fuel, (700, 455))
 
 class Game():
 
@@ -137,13 +151,9 @@ class Game():
         self.background = pygame.image.load ("background.bmp")
         self.ground = pygame.image.load ("ground.bmp")
         
-        
         self.scoreboard = Scoreboard(self.screen)
 
         self.bullets = pygame.sprite.Group()
-        
-        self.playerOneScore = 10
-        self.playerTwoScore = 25
 
     def paint_background(self):
         offset = (pygame.time.get_ticks() % 100000) / 100
@@ -180,15 +190,15 @@ class Game():
             self.paint_background()
             self.tanks.draw(self.screen)
             self.tanks.update()
-            self.scoreboard.score(self.playerOneScore, self.playerTwoScore)
+            self.scoreboard.health(self.playerOne.getHealth(), self.playerTwo.getHealth())
             if self.playerOne.turn is True:
-                self.scoreboard.angle(180 - int(math.degrees(self.playerOne.angle)))
-                #self.scoreboard.power(self.playerOne
-                #self.scoreboard.fuel(self.playerOne        
+                self.scoreboard.angle(180 - int(math.degrees(self.playerOne.getAngle())))
+                #self.scoreboard.power(self.playerOne.
+                self.scoreboard.fuel(self.playerOne.getFuel())       
             elif self.playerTwo.turn is True:
-                self.scoreboard.angle(180 - int(math.degrees(self.playerTwo.angle)))
-                #self.scoreboard.power(self.playerTwo
-                #self.scoreboard.fuel(self.playerTwo
+                self.scoreboard.angle(180 - int(math.degrees(self.playerTwo.getAngle())))
+                #self.scoreboard.power(self.playerTwo.
+                self.scoreboard.fuel(self.playerTwo.getFuel())
             for b in self.bullets.sprites(): #bullets.draw didn't work
                 self.screen.blit(b.image,b.getCurrPos())
             self.bullets.update()
