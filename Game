@@ -74,14 +74,14 @@ class Tank(pygame.sprite.Sprite):
             self.turn = True
     
     def moveForward(self):
-        if self.fuel != 0:
-            self.rect.x += 10      
-            self.fuel-=10
+        if self.fuel >= 1:
+            self.rect.x += 1      
+            self.fuel-=1
     
     def moveBackward(self):
-        if self.fuel != 0:
-            self.rect.x -= 10
-            self.fuel-=10
+        if self.fuel != 1:
+            self.rect.x -= 1
+            self.fuel-=1
         
     def update(self):
         self.updateBarrel()
@@ -207,14 +207,34 @@ class Game():
                     break
                 if e.key == pygame.K_RIGHT:
                     if self.playerOne.turn is True:
-                        self.playerOne.moveForward() 
+                        for i in range(10):                           
+                            self.playerOne.moveForward()
+                            b=pygame.sprite.spritecollideany(self.playerOne,self.blocks)
+                            if b != None:
+                                b.kill()
+                                self.playerOne.fuel-=5 
                     elif self.playerTwo.turn is True:
-                        self.playerTwo.moveForward() 
+                        for i in range(10):
+                            self.playerTwo.moveForward()
+                            b=pygame.sprite.spritecollideany(self.playerTwo,self.blocks)
+                            if b != None:
+                                b.kill()
+                                self.playerTwo.fuel-=5  
                 if e.key == pygame.K_LEFT:
                     if self.playerOne.turn is True:
-                        self.playerOne.moveBackward() 
+                        for i in range(10):
+                            self.playerOne.moveBackward()
+                            b=pygame.sprite.spritecollideany(self.playerOne,self.blocks)
+                            if b != None:
+                                b.kill()
+                                self.playerOne.fuel-=5 
                     elif self.playerTwo.turn is True:
-                        self.playerTwo.moveBackward() 
+                        for i in range(10):
+                            self.playerTwo.moveBackward()
+                            b=pygame.sprite.spritecollideany(self.playerTwo,self.blocks)
+                            if b != None:
+                                b.kill()
+                                self.playerTwo.fuel-=5 
                 if e.key == pygame.K_UP:
                     if self.playerOne.turn is True:
                         self.playerOne.powerUp() 
