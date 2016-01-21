@@ -9,27 +9,27 @@ class Tank(pygame.sprite.Sprite):
         super(Tank, self).__init__()
         if orientation == 'left':
             self.image = pygame.image.load('tank1.bmp').convert()
-            self.barrelOffset = 64
+            self.barrelOffset = 39
         elif orientation == 'right':
             self.image = pygame.image.load('tank2.bmp').convert()
-            self.barrelOffset = 34
+            self.barrelOffset = 21
         else:
             print "Invalid Orientation"
 
-        self.barrelLength = 25
+        self.barrelLength = 15
         self.screen = screen
         
         self.image.set_colorkey((255,255,255), pygame.RLEACCEL)
         self.rect = self.image.get_rect()
 
         self.rect.x = location
-        self.rect.y = 370
+        self.rect.y = 400
 
     def moveForward(self):
-        self.rect.x += 25      
+        self.rect.x += 10      
 
     def moveBackward(self):
-        self.rect.x -= 25
+        self.rect.x -= 10
         
     def update(self):
         self.updateBarrel()
@@ -37,7 +37,7 @@ class Tank(pygame.sprite.Sprite):
     def updateBarrel(self):
         self.mousePos = pygame.mouse.get_pos()
         self.angle = math.atan2(self.rect.y - self.mousePos[1], self.mousePos[0] - (self.rect.x + self.barrelOffset))
-        self.startPos = (self.rect.x + self.barrelOffset, self.rect.y + 8)
+        self.startPos = (self.rect.x + self.barrelOffset, self.rect.y + 5)
         self.endPos = (self.startPos[0] + (self.barrelLength * math.cos(self.angle)), self.startPos[1] - self.barrelLength * math.sin(self.angle))
         pygame.draw.line(self.screen, (0, 0, 0), self.startPos, self.endPos, 3)
 
