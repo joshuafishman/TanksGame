@@ -1,4 +1,4 @@
-import pygame, time, sys, math
+import pygame, time, sys, math, random
 
 def screenUpdate():
     pygame.display.flip()
@@ -115,6 +115,15 @@ class Tank(pygame.sprite.Sprite):
     def getPower(self):
         return self.power
 
+class Block(pygame.sprite.Sprite):
+    def __init__(self, position):
+        super(Block, self).__init__()
+        self.position = position
+        self.image = pygame.image.load('block.bmp').convert()
+        self.rect = self.image.get_rect()
+        self.rect.x = position[0]
+        self.rect.y = position[1]        
+
 class Scoreboard():
     def __init__(self, screen):
         self.screen = screen
@@ -151,13 +160,24 @@ class Scoreboard():
 
 class Game():
 
-    def __init__(self, screen):
+    def __init__(self, screen, size):
         self.screen = screen
+        self.size = size
         self.playerOne = Tank(self.screen, 10,'left')
-        self.playerTwo = Tank(self.screen, 400,'right')
+        self.playerTwo = Tank(self.screen, self.size - 80 ,'right')
         self.tanks = pygame.sprite.Group()
         self.tanks.add(self.playerOne)
         self.tanks.add(self.playerTwo)
+        self.blocks=pygame.sprite.Group()
+        
+        b=[[False for x in range((size-200)/15)] for x in range(31)] #make a field of blocks
+        for i in range (31):
+            for j in range ((size-200)/15):
+                if random.random()<.4:
+                    if i is 0 or b[i-1][j] is True:
+                        self.blocks.add(Block((j*15+100,420-(i*15))))
+                        b[i][j]=True   
+                    
         self.background = pygame.image.load ("background.bmp")
         self.ground = pygame.image.load ("ground.bmp")
         
@@ -208,6 +228,7 @@ class Game():
                     self.playerOne.changeTurn()
                     self.playerTwo.changeTurn()                    
             self.paint_background()
+            self.blocks.draw(self.screen)
             self.tanks.draw(self.screen)
             self.tanks.update()
             for b in self.bullets.sprites(): #bullets.draw didn't work
@@ -236,9 +257,10 @@ class Game():
 
 
 pygame.init()
-screen = pygame.display.set_mode( (1000, 500) )
+size = 500+random.randint(0,500)
+screen = pygame.display.set_mode( (size, 500) )
 pygame.display.set_caption('Tanks')
 pygame.mouse.set_cursor(*pygame.cursors.broken_x)
 
-my_game = Game(screen)
+my_game = Game(screen, size)
 my_game.play()
