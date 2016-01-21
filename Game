@@ -43,7 +43,8 @@ class Tank(pygame.sprite.Sprite):
             self.barrelOffset = 21
         else:
             print "Invalid Orientation"
-
+        
+        self.fuel=70
         self.barrelLength = 15
         self.screen = screen
         
@@ -66,11 +67,12 @@ class Tank(pygame.sprite.Sprite):
             self.turn = True
         return self.turn
     
-    def moveForward(self):
+     def moveForward(self):
         self.rect.x += 10      
-
+        self.fuel-=10
     def moveBackward(self):
         self.rect.x -= 10
+        self.fuel-=10
         
     def update(self):
         self.updateBarrel()
