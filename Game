@@ -80,8 +80,14 @@ class Game():
         events = [event.type for event in pygame.event.get()]
         while pygame.QUIT not in events:
             self.prev_and_off=self.paint_background(self.prev_and_off) #paint and update background
-            if pygame.MOUSEBUTTONDOWN in events:
-                self.playerOne.moveForward()
+            
+            keys_pressed = [event for event in pygame.event.get() if event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN]    
+            for e in keys_pressed:
+                if e.key == pygame.K_RIGHT:
+                    self.playerOne.moveForward()
+                if e.key == pygame.K_LEFT:
+                    self.playerOne.moveBackward()
+                    
             self.tanks.draw(self.screen)
             self.tanks.update()
             screenUpdate()    
