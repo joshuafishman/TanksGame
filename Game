@@ -6,7 +6,7 @@ def screenUpdate():
 
 class Tank(pygame.sprite.Sprite):
 
-    def __init__(self, location):
+    def __init__(self, location, orientation):
         super(Tank, self).__init__()
         if orientation == 'left':
             self.image = pygame.image.load('tank1.bmp').convert()
