@@ -72,7 +72,8 @@ class Tank(pygame.sprite.Sprite):
             self.turn = False
         elif self.turn is False:
             self.turn = True
-    
+        self.fuel=100
+        
     def moveForward(self):
         if self.fuel >= 1:
             self.rect.x += 1      
