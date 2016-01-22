@@ -4,7 +4,7 @@ def screenUpdate():
     pygame.display.flip()
 
 class Bullet(pygame.sprite.Sprite):
-    def __init__(self, posX, posY,velX, velY):
+    def __init__(self, posX, posY,velX, velY, Tank):
         super(Bullet, self).__init__()
         self.image = pygame.image.load('bullet.bmp').convert()
         self.image.set_colorkey((255,255,255), pygame.RLEACCEL)
@@ -14,6 +14,7 @@ class Bullet(pygame.sprite.Sprite):
         self.velX = velX
         self.velY = velY
         self.accY = .01
+        self.tank=Tank
         
     def updatePosition(self):
         self.posX = self.posX + self.velX
@@ -29,20 +30,21 @@ class Bullet(pygame.sprite.Sprite):
         
     def getCurrVel(self):
         return (self.velX, self.velY)
-        
+
     def kill(self, screen):
         pygame.draw.circle(screen, (255,255,0), (int(self.posX), int(self.posY)), 15, 0)
-        pygame.time.wait(3)
-        super(Bullet, self).kill()    
+        pygame.time.wait(5)
+        super(Bullet, self).kill()
     
 class Tank(pygame.sprite.Sprite):
 
     def __init__(self, screen, location, orientation):
         super(Tank, self).__init__()
-        if orientation == 'left':
+        self.orientation=orientation
+        if self.orientation == 'left':
             self.image = pygame.image.load('tank1.bmp').convert()
             self.barrelOffset = 39
-        elif orientation == 'right':
+        elif self.orientation == 'right':
             self.image = pygame.image.load('tank2.bmp').convert()
             self.barrelOffset = 21
         else:
@@ -73,14 +75,13 @@ class Tank(pygame.sprite.Sprite):
         elif self.turn is False:
             self.turn = True
         self.fuel=100
-        
     def moveForward(self):
         if self.fuel >= 1:
             self.rect.x += 1      
             self.fuel-=1
     
     def moveBackward(self):
-        if self.fuel != 1:
+        if self.fuel >= 1:
             self.rect.x -= 1
             self.fuel-=1
         
@@ -108,7 +109,7 @@ class Tank(pygame.sprite.Sprite):
         return self.fuel
    
     def fire(self):
-        return Bullet(self.getBarrelVals()[0][0], self.getBarrelVals()[0][1]-15,self.power/50*2*math.cos(self.getBarrelVals()[1]), self.power/50*-2*math.sin(self.getBarrelVals()[1]))
+        return Bullet(self.getBarrelVals()[0][0], self.getBarrelVals()[0][1]-15,self.power/50*2*math.cos(self.getBarrelVals()[1]), self.power/50*-2*math.sin(self.getBarrelVals()[1]), self)
         
     def powerUp(self):
         if self.power < 100:
@@ -159,7 +160,7 @@ class Scoreboard():
         self.numVal('Angle:', angle, (150, 455))
 
     def power(self, power):
-        self.powerBar('Power', power, (400, 455))
+        self.powerBar('Power', power, (515, 455))
 
     def fuel(self, fuel):
         self.powerBar('Fuel', fuel, (700, 455))
@@ -170,19 +171,20 @@ class Game():
         self.screen = screen
         self.size = size
         self.playerOne = Tank(self.screen, 10,'left')
-        self.playerTwo = Tank(self.screen, self.size[0] - 80 ,'right')
+        self.playerOne.changeTurn()
+        self.playerTwo = Tank(self.screen, self.size - 80 ,'right')
         self.tanks = pygame.sprite.Group()
         self.tanks.add(self.playerOne)
         self.tanks.add(self.playerTwo)
-        self.blocks = pygame.sprite.Group()
+        self.blocks=pygame.sprite.Group()
         
-        b=[[False for x in range((size[0]-200)/15)] for x in range(31)] #make a field of blocks
+        b=[[False for x in range((size-200)/15)] for x in range(31)] #make a field of blocks
         for i in range (31):
-            for j in range ((size[0]-200)/15):
+            for j in range ((size-200)/15):
                 if random.random()<.4:
                     if i is 0 or b[i-1][j] is True:
                         self.blocks.add(Block((j*15+100,420-(i*15))))
-                        b[i][j]=True     
+                        b[i][j]=True   
                     
         self.background = pygame.image.load ("background.bmp")
         self.ground = pygame.image.load ("ground.bmp")
@@ -198,7 +200,6 @@ class Game():
         self.screen.blit(self.ground, (0, 435))
 
     def play(self):
-        self.playerOne.changeTurn()
         stop = False
         while stop is False:
             keys_pressed = [event for event in pygame.event.get() if event.type == pygame.KEYDOWN or event.type == pygame.QUIT]    
@@ -235,10 +236,11 @@ class Game():
                             b=pygame.sprite.spritecollideany(self.playerTwo,self.blocks)
                             if b != None:
                                 b.kill()
-                                self.playerTwo.fuel-=5 
+                                self.playerTwo.fuel-=5  
                 if e.key == pygame.K_UP:
                     if self.playerOne.turn is True:
-                        self.playerOne.powerUp() 
+                        for i in range (10):
+                            self.playerOne.powerUp() 
                     elif self.playerTwo.turn is True:
                         self.playerTwo.powerUp() 
                 if e.key == pygame.K_DOWN:
@@ -258,6 +260,9 @@ class Game():
             self.tanks.draw(self.screen)
             self.tanks.update()
             for b in self.bullets.sprites(): #bullets.draw didn't work
+                for i in pygame.sprite.spritecollide(b, self.blocks, False):
+                    i.kill()
+                    b.kill(screen)
                 if pygame.sprite.collide_rect(b,self.playerOne):
                     b.kill(self.screen)
                     self.playerOne.health -= 10
@@ -277,6 +282,7 @@ class Game():
                 self.scoreboard.power(self.playerTwo.getPower())
                 self.scoreboard.fuel(self.playerTwo.getFuel())
             self.bullets.update()
+            screenUpdate()
             for t in self.tanks.sprites():
                 if t.health == 0:
                     self.screen.blit(pygame.font.Font(None, 100).render(t.orientation+" player wins", 1, (0, 0, 0)), (200,200))
@@ -286,14 +292,13 @@ class Game():
                     my_game = Game(self.screen, self.size)
                     my_game.play()
                     return
-            screenUpdate()    
         pygame.quit()
         sys.exit()
 
 
 pygame.init()
-size = (1000, 500)
-screen = pygame.display.set_mode(size)
+size = 1000
+screen = pygame.display.set_mode( (size, 500) )
 pygame.display.set_caption('Tanks')
 pygame.mouse.set_cursor(*pygame.cursors.broken_x)
 
