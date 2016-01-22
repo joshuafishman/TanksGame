@@ -274,14 +274,15 @@ class Game():
                     self.playerOne.changeTurn()
                     self.playerTwo.changeTurn()
             for t in self.tanks.sprites():
-                if self.mapNum is 2:
+                if t.getBarrelVals()[0][0]>(min(self.gap)+50) and t.getBarrelVals()[0][0]<(max(self.gap)-50):
+                    if self.mapNum is 2:
                         for i in range(10):
                             t.rect.y +=5
                             self.tanks.draw(self.screen)
                             screenUpdate()
                             pygame.time.wait(5)
                         t.health = 0
-                elif self.mapNum is 3:
+                    elif self.mapNum is 3:
                         if pygame.time.get_ticks()-t.tburned>100:
                             t.health-=1
                             pygame.draw.circle(self.screen, (255,150,0), (t.rect.x, 435), 15, 0)
