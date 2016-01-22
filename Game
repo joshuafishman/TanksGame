@@ -191,8 +191,8 @@ class Game():
         b=[[False for x in range((size-200)/15)] for x in range(31)] #make a field of blocks
         for i in range (31):
             for j in range ((size-200)/15):
-                if random.random()<.4:
-                    if i is 0 or b[i-1][j] is True and j*15+100 not in self.gap:
+                if random.random()<.4 and (j*15+100) not in self.gap:
+                    if i is 0 or b[i-1][j] is True:
                         self.blocks.add(Block((j*15+100,420-(i*15))))
                         b[i][j]=True   
                     
