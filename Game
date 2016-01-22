@@ -62,14 +62,15 @@ class Tank(pygame.sprite.Sprite):
 
         self.rect.x = location
         self.rect.y = 400
+        self.tburned=0
+
 
         self.turn = True
         self.mousePos = pygame.mouse.get_pos()
         self.angle = math.atan2(self.rect.y - self.mousePos[1], self.mousePos[0] - (self.rect.x + self.barrelOffset))
         self.startPos = (self.rect.x + self.barrelOffset, self.rect.y + 5)
         self.endPos = (self.startPos[0] + (self.barrelLength * math.cos(self.angle)), self.startPos[1] - self.barrelLength * math.sin(self.angle))
-        self.tburned=0
-        
+    
     def changeTurn (self):
         if self.turn is True:
             self.turn = False
@@ -111,6 +112,12 @@ class Tank(pygame.sprite.Sprite):
    
     def fire(self):
         return Bullet(self.getBarrelVals()[0][0]+15*math.cos(self.angle), self.getBarrelVals()[0][1]-15*math.sin(self.angle),self.power/50*2*math.cos(self.getBarrelVals()[1]), self.power/50*-2*math.sin(self.getBarrelVals()[1]), self)
+
+    def sprayFire(self):
+        return (Bullet(self.getBarrelVals()[0][0], self.getBarrelVals()[0][1]-15,self.power/50*2*math.cos(self.getBarrelVals()[1]), self.power/50*-2*math.sin(self.getBarrelVals()[1]), self),Bullet(self.getBarrelVals()[0][0], self.getBarrelVals()[0][1]-15,self.power/50*2.5*math.cos(self.getBarrelVals()[1]), self.power/50*-1.5*math.sin(self.getBarrelVals()[1]), self),Bullet(self.getBarrelVals()[0][0], self.getBarrelVals()[0][1]-15,self.power/50*1.5*math.cos(self.getBarrelVals()[1]), self.power/50*-2.5*math.sin(self.getBarrelVals()[1]), self))
+
+    def panicFire(self):
+        return (Bullet(self.getBarrelVals()[0][0], self.getBarrelVals()[0][1]-15,self.power/50*2*math.cos(self.getBarrelVals()[1]), self.power/50*-2*math.sin(self.getBarrelVals()[1]), self),Bullet(self.getBarrelVals()[0][0], self.getBarrelVals()[0][1]-15,self.power/50*2.5*math.cos(self.getBarrelVals()[1]), self.power/50*-1.5*math.sin(self.getBarrelVals()[1]), self),Bullet(self.getBarrelVals()[0][0], self.getBarrelVals()[0][1]-15,self.power/50*1.5*math.cos(self.getBarrelVals()[1]), self.power/50*-2.5*math.sin(self.getBarrelVals()[1]), self),Bullet(self.getBarrelVals()[0][0], self.getBarrelVals()[0][1]-15,self.power/50*3*math.cos(self.getBarrelVals()[1]), self.power/50*-1*math.sin(self.getBarrelVals()[1]), self),Bullet(self.getBarrelVals()[0][0], self.getBarrelVals()[0][1]-15,self.power/50*1*math.cos(self.getBarrelVals()[1]), self.power/50*-3*math.sin(self.getBarrelVals()[1]), self))
         
     def powerUp(self):
         if self.power < 100:
@@ -167,7 +174,6 @@ class Scoreboard():
         self.powerBar('Fuel', fuel, (700, 455))
 
 class Game():
-
     def __init__(self, screen, size, mapNum):
         self.screen = screen
         self.size = size
@@ -267,7 +273,54 @@ class Game():
                     elif self.playerTwo.turn is True:
                         self.playerTwo.powerDown()
                 if e.key == pygame.K_SPACE:
-                    if self.playerOne.turn is True:
+                    if self.mapNum == 3:
+                        self.playerOne.health -= 5
+                        self.playerTwo.health -= 5
+                    if self.playerOne.turn is True and self.mapNum == 3:
+                        if self.playerOne.health<30:
+                            self.playerOne.rect.x +=100
+                            self.tanks.draw(self.screen)
+                            screenUpdate()
+                            pygame.time.wait(5)
+                            self.playerOne.rect.x -=100
+                            self.tanks.draw(self.screen)
+                            screenUpdate()
+                            pygame.time.wait(5)
+                            self.bullets.add(self.playerOne.panicFire()[0])
+                            self.bullets.add(self.playerOne.panicFire()[1])
+                            self.bullets.add(self.playerOne.panicFire()[2])
+                            self.bullets.add(self.playerOne.panicFire()[3])
+                            self.bullets.add(self.playerOne.panicFire()[4])
+                        elif self.playerOne.health<70:
+                            self.playerOne.rect.x +=5
+                            self.tanks.draw(self.screen)
+                            screenUpdate()
+                            pygame.time.wait(5)
+                            self.playerOne.rect.x -=5
+                            self.tanks.draw(self.screen)
+                            screenUpdate()
+                            pygame.time.wait(5)
+
+                            self.bullets.add(self.playerOne.sprayFire()[0])
+                            self.bullets.add(self.playerOne.sprayFire()[1])
+                            self.bullets.add(self.playerOne.sprayFire()[2])
+                        else:
+                            self.bullets.add(self.playerOne.fire())
+                    elif self.playerTwo.turn is True and self.mapNum == 3:
+                        if self.playerTwo.health<30:
+                            self.bullets.add(self.playerTwo.panicFire()[0])
+                            self.bullets.add(self.playerTwo.panicFire()[1])
+                            self.bullets.add(self.playerTwo.panicFire()[2])
+                            self.bullets.add(self.playerTwo.panicFire()[3])
+                            self.bullets.add(self.playerTwo.panicFire()[4])
+                        elif self.playerTwo.health<70:
+                            pygame.time.wait(5)
+                            self.bullets.add(self.playerTwo.sprayFire()[0])
+                            self.bullets.add(self.playerTwo.sprayFire()[1])
+                            self.bullets.add(self.playerTwo.sprayFire()[2])
+                        else:
+                            self.bullets.add(self.playerTwo.fire())
+                    elif self.playerOne.turn is True:
                         self.bullets.add(self.playerOne.fire())
                     elif self.playerTwo.turn is True:
                         self.bullets.add(self.playerTwo.fire())
@@ -287,8 +340,9 @@ class Game():
                             t.health-=1
                             pygame.draw.circle(self.screen, (255,150,0), (t.rect.x, 435), 15, 0)
                             screenUpdate()
-                            pygame.time.wait(3)
+                            pygame.time.wait(8)
                             t.tburned=pygame.time.get_ticks()
+
             self.paint_background()
             self.blocks.draw(self.screen)
             self.tanks.draw(self.screen)
@@ -318,9 +372,10 @@ class Game():
             self.bullets.update()
             screenUpdate()
             for t in self.tanks.sprites():
-                if t.health == 0:
+                if t.health <= 0:
                     self.screen.blit(pygame.font.Font(None, 100).render(t.orientation+" player loses", 1, (0, 0, 0)), (200,200))
                     screenUpdate()
+                    print str(self.tanks.sprites())
                     pygame.time.wait(3000)
                     my_game = Game(self.screen, self.size,self.mapNum)
                     my_game.play()
@@ -329,9 +384,8 @@ class Game():
         sys.exit()
 
 
-
 size = 1000
-m=int(raw_input("Map 1, 2 or 3?"))
+m=int(raw_input("Map 1, 2 or 3? "))
 pygame.init()
 screen = pygame.display.set_mode( (size, 500) )
 pygame.display.set_caption('Tanks')
