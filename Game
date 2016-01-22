@@ -289,7 +289,6 @@ class Game():
                             screenUpdate()
                             pygame.time.wait(3)
                             t.tburned=pygame.time.get_ticks()
-
             self.paint_background()
             self.blocks.draw(self.screen)
             self.tanks.draw(self.screen)
@@ -330,6 +329,7 @@ class Game():
         sys.exit()
 
 
+
 size = 1000
 m=int(raw_input("Map 1, 2 or 3?"))
 pygame.init()
@@ -338,3 +338,4 @@ pygame.display.set_caption('Tanks')
 pygame.mouse.set_cursor(*pygame.cursors.broken_x)
 
 my_game = Game(screen, size,m)
+my_game.play()
