@@ -68,7 +68,8 @@ class Tank(pygame.sprite.Sprite):
         self.angle = math.atan2(self.rect.y - self.mousePos[1], self.mousePos[0] - (self.rect.x + self.barrelOffset))
         self.startPos = (self.rect.x + self.barrelOffset, self.rect.y + 5)
         self.endPos = (self.startPos[0] + (self.barrelLength * math.cos(self.angle)), self.startPos[1] - self.barrelLength * math.sin(self.angle))
-    
+        self.tburned=0
+        
     def changeTurn (self):
         if self.turn is True:
             self.turn = False
@@ -190,7 +191,7 @@ class Game():
         elif mapNum is 3:
             self.background = pygame.image.load ("background3.bmp")
             self.ground = pygame.image.load ("ground3.bmp")
-            self.gap = [-1,-1]
+            self.gap = [350,650]
             self.scroll=False
         self.ground.set_colorkey((255,255,255), pygame.RLEACCEL)
         
@@ -199,7 +200,6 @@ class Game():
             for j in range ((size-200)/15):
                 if random.random()<.4 and (j*15+100) not in self.gap:
                     if i is 0 or b[i-1][j] is True:
-                        print str(j*15+100)
                         self.blocks.add(Block((j*15+100,420-(i*15))))
                         b[i][j]=True   
                     
@@ -274,13 +274,17 @@ class Game():
                     self.playerOne.changeTurn()
                     self.playerTwo.changeTurn()
             for t in self.tanks.sprites():
-                if t.getBarrelVals()[0][0]>(min(self.gap)+50) and t.getBarrelVals()[0][0]<(max(self.gap)-50):
-                    t.health = 0
-                    for i in range(10):
-                        t.rect.y +=5
-                        self.tanks.draw(self.screen)
-                        screenUpdate()
-                        pygame.time.wait(5)
+                if self.mapNum is 2:
+                        for i in range(10):
+                            t.rect.y +=5
+                            self.tanks.draw(self.screen)
+                            screenUpdate()
+                            pygame.time.wait(5)
+                        t.health = 0
+                elif self.mapNum is 3:
+                        if pygame.time.get_ticks()-t.tburned>100:
+                            t.health-=1
+                            t.tburned=pygame.time.get_ticks()
 
             self.paint_background()
             self.blocks.draw(self.screen)
