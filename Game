@@ -109,7 +109,7 @@ class Tank(pygame.sprite.Sprite):
         return self.fuel
    
     def fire(self):
-        return Bullet(self.getBarrelVals()[0][0], self.getBarrelVals()[0][1]-15,self.power/50*2*math.cos(self.getBarrelVals()[1]), self.power/50*-2*math.sin(self.getBarrelVals()[1]), self)
+        return Bullet(self.getBarrelVals()[0][0]+15*math.cos(self.angle), self.getBarrelVals()[0][1]-15*math.sin(self.angle),self.power/50*2*math.cos(self.getBarrelVals()[1]), self.power/50*-2*math.sin(self.getBarrelVals()[1]), self)
         
     def powerUp(self):
         if self.power < 100:
@@ -167,7 +167,7 @@ class Scoreboard():
 
 class Game():
 
-    def __init__(self, screen, size):
+    def __init__(self, screen, size, mapNum):
         self.screen = screen
         self.size = size
         self.playerOne = Tank(self.screen, 10,'left')
@@ -177,17 +177,25 @@ class Game():
         self.tanks.add(self.playerOne)
         self.tanks.add(self.playerTwo)
         self.blocks=pygame.sprite.Group()
+        self.mapNum=mapNum
+        
+        self.background = pygame.image.load ("background.bmp")
+        if mapNum is 1:
+            self.ground = pygame.image.load ("ground.bmp")
+            self.gap = []
+        elif mapNum is 2:
+            self.ground = pygame.image.load ("ground2.bmp")
+            self.gap = range(450,650)
+        self.ground.set_colorkey((255,255,255), pygame.RLEACCEL)
         
         b=[[False for x in range((size-200)/15)] for x in range(31)] #make a field of blocks
         for i in range (31):
             for j in range ((size-200)/15):
                 if random.random()<.4:
-                    if i is 0 or b[i-1][j] is True:
+                    if i is 0 or b[i-1][j] is True and j*15+100 not in self.gap:
                         self.blocks.add(Block((j*15+100,420-(i*15))))
                         b[i][j]=True   
                     
-        self.background = pygame.image.load ("background.bmp")
-        self.ground = pygame.image.load ("ground.bmp")
         
         self.scoreboard = Scoreboard(self.screen)
 
@@ -254,7 +262,16 @@ class Game():
                     elif self.playerTwo.turn is True:
                         self.bullets.add(self.playerTwo.fire())
                     self.playerOne.changeTurn()
-                    self.playerTwo.changeTurn()                    
+                    self.playerTwo.changeTurn()
+            for t in self.tanks.sprites():
+                if t.getBarrelVals()[0][0]>(min(self.gap)+50) and t.getBarrelVals()[0][0]<(max(self.gap)-50):
+                    t.health = 0
+                    for i in range(10):
+                        t.rect.y +=5
+                        self.tanks.draw(self.screen)
+                        screenUpdate()
+                        pygame.time.wait(5)
+
             self.paint_background()
             self.blocks.draw(self.screen)
             self.tanks.draw(self.screen)
@@ -285,11 +302,11 @@ class Game():
             screenUpdate()
             for t in self.tanks.sprites():
                 if t.health == 0:
-                    self.screen.blit(pygame.font.Font(None, 100).render(t.orientation+" player wins", 1, (0, 0, 0)), (200,200))
+                    self.screen.blit(pygame.font.Font(None, 100).render(t.orientation+" player loses", 1, (0, 0, 0)), (200,200))
                     screenUpdate()
                     print str(self.tanks.sprites())
                     pygame.time.wait(3000)
-                    my_game = Game(self.screen, self.size)
+                    my_game = Game(self.screen, self.size,self.mapNum)
                     my_game.play()
                     return
         pygame.quit()
@@ -302,5 +319,5 @@ screen = pygame.display.set_mode( (size, 500) )
 pygame.display.set_caption('Tanks')
 pygame.mouse.set_cursor(*pygame.cursors.broken_x)
 
-my_game = Game(screen, size)
+my_game = Game(screen, size,2)
 my_game.play()
