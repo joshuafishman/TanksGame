@@ -108,7 +108,7 @@ class Tank(pygame.sprite.Sprite):
         return self.fuel
    
     def fire(self):
-        return Bullet(self.getBarrelVals()[0][0], self.getBarrelVals()[0][1]-15,self.power/50*2*math.cos(self.getBarrelVals()[1]), self.power/50*-2*math.sin(self.getBarrelVals()[1]), self)
+        return Bullet(self.getBarrelVals()[0][0], self.getBarrelVals()[0][1]-15,self.power/50*2*math.cos(self.getBarrelVals()[1]), self.power/50*-2*math.sin(self.getBarrelVals()[1]))
         
     def powerUp(self):
         if self.power < 100:
