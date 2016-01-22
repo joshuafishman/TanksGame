@@ -277,6 +277,15 @@ class Game():
                 self.scoreboard.power(self.playerTwo.getPower())
                 self.scoreboard.fuel(self.playerTwo.getFuel())
             self.bullets.update()
+            for t in self.tanks.sprites():
+                if t.health == 0:
+                    self.screen.blit(pygame.font.Font(None, 100).render(t.orientation+" player wins", 1, (0, 0, 0)), (200,200))
+                    screenUpdate()
+                    print str(self.tanks.sprites())
+                    pygame.time.wait(3000)
+                    my_game = Game(self.screen, self.size)
+                    my_game.play()
+                    return
             screenUpdate()    
         pygame.quit()
         sys.exit()
