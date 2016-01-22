@@ -322,11 +322,11 @@ class Game():
         sys.exit()
 
 
-pygame.init()
 size = 1000
+m=int(raw_input("Map 1, 2 or 3?"))
+pygame.init()
 screen = pygame.display.set_mode( (size, 500) )
 pygame.display.set_caption('Tanks')
 pygame.mouse.set_cursor(*pygame.cursors.broken_x)
 
-my_game = Game(screen, size,3)
-my_game.play()
+my_game = Game(screen, size,m)
